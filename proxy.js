@@ -8,8 +8,24 @@ async function main() {
     const hotKey = process.env.HOT_KEY;
     const coldKey = process.env.COLD_KEY;
 
+    // Validation: Ensure all required environment variables are provided
+    if (!mnemonic) {
+        console.error("Error: MNEMONIC must be provided as an environment variable.");
+        process.exit(1);
+    }
+
     if (isNaN(netuid)) {
-        console.error("Error: SEED and NETUID must be provided as environment variables.");
+        console.error("Error: NETUID must be provided as a valid number environment variable.");
+        process.exit(1);
+    }
+
+    if (!hotKey) {
+        console.error("Error: HOT_KEY must be provided as an environment variable.");
+        process.exit(1);
+    }
+
+    if (!coldKey) {
+        console.error("Error: COLD_KEY must be provided as an environment variable.");
         process.exit(1);
     }
 
