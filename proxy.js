@@ -7,6 +7,7 @@ async function main() {
     const netuid = parseInt(process.env.NETUID, 10); // NetUID from environment
     const hotKey = process.env.HOT_KEY;
     const coldKey = process.env.COLD_KEY;
+    const providerEndpoint = process.env.PROVIDER_ENDPOINT;
 
     // Validation: Ensure all required environment variables are provided
     if (!mnemonic) {
@@ -31,7 +32,7 @@ async function main() {
 
     // Initialize Polkadot.js and wait for crypto initialization
     await cryptoWaitReady();
-    const provider = new WsProvider('wss://test.finney.opentensor.ai:443');
+    const provider = new WsProvider(providerEndpoint);
     const api = await ApiPromise.create({ provider });
 
     // Initialize keyring and accounts
