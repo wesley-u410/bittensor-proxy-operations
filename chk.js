@@ -49,10 +49,9 @@ async function main() {
     console.log(`Cold Key Address: ${coldKey}`)
 
     // Step 1: Query the childKeyTake for the given hotkey
-    const targetHotKey = '5GKH9FPPnWSUoeeTJp19wVtd84XqFW4pyK2ijV2GsFbhTrP1';
     try {
-        const childKeyTakeResult = await api.query.subtensorModule.childkeyTake(targetHotKey, 8);
-        console.log(`childKeyTake result for ${targetHotKey}:`, childKeyTakeResult.toHuman());
+        const childKeyTakeResult = await api.query.subtensorModule.childkeyTake(childKey, 8);
+        console.log(`childKeyTake result for ${childKey}:`, childKeyTakeResult.toHuman());
     } catch (error) {
         console.error('Error querying childKeyTake:', error);
     }

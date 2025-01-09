@@ -12,6 +12,3 @@ RUN npm install
 
 # Copy the application code
 COPY . .
-
-# Command to run the script (parameters will be passed at runtime)
-CMD ["node", "proxy.js"]
