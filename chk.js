@@ -50,7 +50,7 @@ async function main() {
 
     // Step 1: Query the childKeyTake for the given hotkey
     try {
-        const childKeyTakeResult = await api.query.subtensorModule.childkeyTake(childKey, 8);
+        const childKeyTakeResult = await api.query.subtensorModule.childkeyTake(childKey, netuid);
         console.log(`childKeyTake result for ${childKey}:`, childKeyTakeResult.toHuman());
     } catch (error) {
         console.error('Error querying childKeyTake:', error);
@@ -69,6 +69,14 @@ async function main() {
     const proxyCallHash = await proxyCall.signAndSend(proxy);
 
     console.log(`Bittensor chk successfully: ${proxyCallHash.toHex()}`);
+
+    // // Step 3 (Optional): After running, check child key is set
+    // try {
+    //     const childKeyListResult = await api.query.subtensorModule.childKeys(netuid, hotKey);
+    //     console.log(`childKeyListResult result for ${hotKey}:`, childKeyListResult.toHuman());
+    // } catch (error) {
+    //     console.error('Error querying childKeyTake:', error);
+    // }
 }
 
 main().catch(console.error).finally(() => process.exit());

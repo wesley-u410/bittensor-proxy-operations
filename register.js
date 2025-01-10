@@ -42,6 +42,20 @@ async function main() {
     console.log(`Proxy Address: ${proxy.address}`);
     console.log(`Cold Key Address: ${coldKey}`)
 
+    // Step 1: Ensure registration is open for given netuid
+    try {
+        const regAllowed = await api.query.subtensorModule.networkRegistrationAllowed(netuid);
+        console.log(`networkRegistrationAllowed result for netuid ${netuid}:`, regAllowed.toHuman());
+
+        // Check if the result is false
+        if (!regAllowed.toHuman()) {
+            console.log(`network registration is closed for netuid ${netuid}, aborting...`);
+            process.exit(1);
+        }
+    } catch (error) {
+        console.error('Error querying networkRegistrationAllowed:', error);
+    }
+
     // Step 2: Use proxy for registration
     const registerTx = api.tx.subtensorModule.burnedRegister(netuid, hotKey);
 
