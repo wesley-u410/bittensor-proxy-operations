@@ -57,8 +57,8 @@ async function main() {
     }
 
     // Step 2: Use proxy for setting children
-    const children = [[1.0, childKey]];
-    const chkTx = api.tx.subtensorModule.setChildren(netuid, hotKey, children);
+    const children = [[BigInt('18446744073709551615'), childKey]]
+    const chkTx = api.tx.subtensorModule.setChildren(hotKey, netuid, children);
 
     console.log('chkTx', chkTx.toHuman());
 
