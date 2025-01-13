@@ -2,6 +2,9 @@
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
 const { cryptoWaitReady } = require('@polkadot/util-crypto');
 
+// Used to represent "max balance" (100% of validator balance) being delegated to a single child key on a subnet
+const MAX_U64 = BigInt('18446744073709551615')
+
 async function main() {
     const mnemonic = process.env.MNEMONIC;
     const netuid = parseInt(process.env.NETUID, 10); // NetUID from environment
@@ -52,12 +55,30 @@ async function main() {
     try {
         const childKeyTakeResult = await api.query.subtensorModule.childkeyTake(childKey, netuid);
         console.log(`childKeyTake result for ${childKey}:`, childKeyTakeResult.toHuman());
+        if (Number(childKeyTakeResult.toHuman()) !== 0) {
+            console.log(`ERROR: Non-zero childKeyTake result for ${childKey}:`, childKeyTakeResult.toHuman());
+            process.exit(1);
+        }
     } catch (error) {
         console.error('Error querying childKeyTake:', error);
     }
 
-    // Step 2: Use proxy for setting children
-    const children = [[BigInt('18446744073709551615'), childKey]]
+    // Step 2: Check child key is not already set
+    try {
+        const childKeyListResult = await api.query.subtensorModule.childKeys(netuid, hotKey);
+        console.log(`childKeyListResult result for ${hotKey}:`, childKeyListResult.toHuman());
+
+        // If childKeyListResult is not empty, wait for user confirmation
+        if (!childKeyListResult.isEmpty) {
+            console.log('Child key list is not empty, pausing script. Press "Enter" to continue...');
+            await waitForEnter();
+        }
+    } catch (error) {
+        console.error('Error querying childKeyListResult:', error);
+    }
+
+    // Step 3: Use proxy for setting children
+    const children = [[MAX_U64, childKey]]
     const chkTx = api.tx.subtensorModule.setChildren(hotKey, netuid, children);
 
     console.log('chkTx', chkTx.toHuman());
@@ -66,17 +87,27 @@ async function main() {
 
     console.log('proxyCall', proxyCall.toHuman());
 
+    console.log(`Sending CHK transaction for netUID ${netuid}.`);
+    await waitForEnter();
+
     const proxyCallHash = await proxyCall.signAndSend(proxy);
 
     console.log(`Bittensor chk successfully: ${proxyCallHash.toHex()}`);
+}
 
-    // // Step 3 (Optional): After running, check child key is set
-    // try {
-    //     const childKeyListResult = await api.query.subtensorModule.childKeys(netuid, hotKey);
-    //     console.log(`childKeyListResult result for ${hotKey}:`, childKeyListResult.toHuman());
-    // } catch (error) {
-    //     console.error('Error querying childKeyTake:', error);
-    // }
+// Helper function to wait for user to press "Enter"
+function waitForEnter() {
+    return new Promise((resolve) => {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        rl.question('Press Enter to continue...', () => {
+            rl.close();
+            resolve();
+        });
+    });
 }
 
 main().catch(console.error).finally(() => process.exit());
