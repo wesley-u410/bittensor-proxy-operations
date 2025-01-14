@@ -1,6 +1,7 @@
 // Import dependencies
 const { ApiPromise, WsProvider, Keyring } = require('@polkadot/api');
 const { cryptoWaitReady } = require('@polkadot/util-crypto');
+const readline = require('readline');
 
 // Used to represent "max balance" (100% of validator balance) being delegated to a single child key on a subnet
 const MAX_U64 = BigInt('18446744073709551615')
@@ -65,7 +66,7 @@ async function main() {
 
     // Step 2: Check child key is not already set
     try {
-        const childKeyListResult = await api.query.subtensorModule.childKeys(netuid, hotKey);
+        const childKeyListResult = await api.query.subtensorModule.childKeys(hotKey, netuid);
         console.log(`childKeyListResult result for ${hotKey}:`, childKeyListResult.toHuman());
 
         // If childKeyListResult is not empty, wait for user confirmation
