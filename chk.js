@@ -89,7 +89,6 @@ async function main() {
     console.log('proxyCall', proxyCall.toHuman());
 
     console.log(`Sending CHK transaction for netUID ${netuid}.`);
-    await waitForEnter();
 
     const proxyCallHash = await proxyCall.signAndSend(proxy);
 
