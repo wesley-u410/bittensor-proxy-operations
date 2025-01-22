@@ -66,26 +66,10 @@ async function main() {
     console.log('proxyCall', proxyCall.toHuman());
 
     console.log(`Sending registration transaction for netUID ${netuid}.`);
-    await waitForEnter();
 
     const proxyCallHash = await proxyCall.signAndSend(proxy);
 
     console.log(`Bittensor registered successfully: ${proxyCallHash.toHex()}`);
-}
-
-// Helper function to wait for user to press "Enter"
-function waitForEnter() {
-    return new Promise((resolve) => {
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-
-        rl.question('Press Enter to continue...', () => {
-            rl.close();
-            resolve();
-        });
-    });
 }
 
 main().catch(console.error).finally(() => process.exit());
