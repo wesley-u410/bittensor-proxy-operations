@@ -13,6 +13,7 @@ async function main() {
     const coldKey = process.env.COLD_KEY;
     const childKey = process.env.CHILD_KEY;
     const providerEndpoint = process.env.PROVIDER_ENDPOINT;
+    const force = process.env.FORCE_RUN;
 
     // Validation: Ensure all required environment variables are provided
     if (!mnemonic) {
@@ -71,8 +72,12 @@ async function main() {
 
         // If childKeyListResult is not empty, wait for user confirmation
         if (!childKeyListResult.isEmpty) {
-            console.log('Child key list is not empty, pausing script. Press "Enter" to continue...');
-            await waitForEnter();
+            console.log('Child key list is not empty, pausing script. Please re-run with FORCE_RUN=true to continue.');
+            if (force === 'true') {
+                console.log('FORCE_RUN = True, ignoring non-empty child key list')
+            } else {
+                return
+            }
         }
     } catch (error) {
         console.error('Error querying childKeyListResult:', error);
@@ -93,21 +98,6 @@ async function main() {
     const proxyCallHash = await proxyCall.signAndSend(proxy);
 
     console.log(`Bittensor chk successfully: ${proxyCallHash.toHex()}`);
-}
-
-// Helper function to wait for user to press "Enter"
-function waitForEnter() {
-    return new Promise((resolve) => {
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-
-        rl.question('Press Enter to continue...', () => {
-            rl.close();
-            resolve();
-        });
-    });
 }
 
 main().catch(console.error).finally(() => process.exit());
