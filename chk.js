@@ -59,7 +59,11 @@ async function main() {
         console.log(`childKeyTake result for ${childKey}:`, childKeyTakeResult.toHuman());
         if (Number(childKeyTakeResult.toHuman()) !== 0) {
             console.log(`ERROR: Non-zero childKeyTake result for ${childKey}:`, childKeyTakeResult.toHuman());
-            process.exit(1);
+            if (force === 'true') {
+                console.log('FORCE_RUN = True, ignoring non-zero child key take result')
+            } else {
+                process.exit(1);
+            }
         }
     } catch (error) {
         console.error('Error querying childKeyTake:', error);
@@ -72,11 +76,11 @@ async function main() {
 
         // If childKeyListResult is not empty, wait for user confirmation
         if (!childKeyListResult.isEmpty) {
-            console.log('Child key list is not empty, pausing script. Please re-run with FORCE_RUN=true to continue.');
             if (force === 'true') {
                 console.log('FORCE_RUN = True, ignoring non-empty child key list')
             } else {
-                return
+                console.log('Child key list is not empty, pausing script. Please re-run with FORCE_RUN=true to continue.');
+                process.exit(1);
             }
         }
     } catch (error) {
